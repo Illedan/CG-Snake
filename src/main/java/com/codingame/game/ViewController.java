@@ -13,6 +13,7 @@ public class ViewController {
     }
 
     public void onTurn(){
-
+        // View part
+        //
     }
 }

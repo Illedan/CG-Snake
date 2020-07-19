@@ -1,5 +1,7 @@
 package com.codingame.game;
 
+import java.awt.*;
+
 public class SnakeDirection {
     private final Direction dir;
     public SnakeDirection(String direction) throws IllegalArgumentException{
@@ -9,6 +11,10 @@ public class SnakeDirection {
         catch (Exception e){
             throw new IllegalArgumentException("Can't parse direction: " + direction + ". Valid values are: N, W, S or E");
         }
+    }
+
+    public Point getNext(Point current){
+        return new Point(current.x+getDx(), current.y+getDy());
     }
 
     public int getDy(){
