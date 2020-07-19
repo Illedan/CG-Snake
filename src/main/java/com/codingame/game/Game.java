@@ -53,10 +53,25 @@ public class Game {
     }
 
     private String[] createInput(int player){
-        // send initial
-        String[] inputs = new String[50];
-        // Initialize
-        return inputs;
+        Snake currentSnake = snakes.get(player);
+        ArrayList<String> inputs = new ArrayList<>();
+        if (!currentSnake.isInitialized){
+            inputs.add(Constants.WIDTH + " " + Constants.HEIGHT + " " + snakes.size() + " " + Constants.MAX_FOOD + " " + player);
+        }
+
+        inputs.add(countAlivePlayers() + "");
+        for (Snake snake : snakes){
+            inputs.add(snake.id + " " +  snake.score + " " + snake.snake.size());
+            for(SnakePart part : snake.snake){
+                inputs.add(part.point.x + " " + part.point.y);
+            }
+        }
+
+        for (Point food : food){
+            inputs.add(food.x + " " + food.y);
+        }
+
+        return GetStringArray(inputs);
     }
 
     private int getNextPlayer(){
@@ -124,5 +139,14 @@ public class Game {
         }
 
         return count;
+    }
+
+    public static String[] GetStringArray(ArrayList<String> arr)
+    {
+        String str[] = new String[arr.size()];
+        for (int j = 0; j < arr.size(); j++) {
+            str[j] = arr.get(j);
+        }
+        return str;
     }
 }
