@@ -1,18 +1,21 @@
 package com.codingame.game;
-import java.util.List;
 
 import com.codingame.gameengine.core.AbstractPlayer;
-import com.codingame.gameengine.core.AbstractPlayer.TimeoutException;
+import com.codingame.gameengine.module.endscreen.EndScreenModule;
+import com.codingame.gameengine.module.entities.GraphicEntityModule;
 import com.codingame.gameengine.core.AbstractReferee;
 import com.codingame.gameengine.core.MultiplayerGameManager;
-import com.codingame.gameengine.module.entities.GraphicEntityModule;
+import com.codingame.gameengine.module.tooltip.TooltipModule;
 import com.google.inject.Inject;
 
 import javax.swing.text.View;
+import java.util.Arrays;
 
 public class Referee extends AbstractReferee implements IReferee {
     @Inject private MultiplayerGameManager<Player> gameManager;
     @Inject private GraphicEntityModule graphicEntityModule;
+    @Inject private EndScreenModule endScreenModule;
+    @Inject private TooltipModule tooltipModule;
     private Game game;
     private ViewController viewController;
 
@@ -25,6 +28,15 @@ public class Referee extends AbstractReferee implements IReferee {
         game = new Game(gameManager.getPlayerCount(), this, seed);
         viewController = new ViewController(game, graphicEntityModule, gameManager);
     }
+
+    @Override
+    public void onEnd() {
+        int[] scores = gameManager.getPlayers().stream().mapToInt(p -> p.getScore()).toArray();
+        String[] texts = Arrays.asList(gameManager.getPlayers().stream().map(p -> p.getScore()+"").toArray()).toArray(new String[game.snakes.size()]);;
+        endScreenModule.setScores(scores, texts);
+        endScreenModule.setTitleRankingsSprite("logo.png");
+    }
+
 
     @Override
     public void gameTurn(int turn) {

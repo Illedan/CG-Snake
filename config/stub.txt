@@ -1,0 +1,6 @@
+
+read width:int height:int playercount:int foodcount:int myid:int
+gameloop
+
+read aliveplayers:int
+loop aliveplayers read
