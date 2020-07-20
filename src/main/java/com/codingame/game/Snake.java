@@ -4,7 +4,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class Snake {
-    private static int deathScore = -4;
+    private static int deathScore = -3;
     public int score;
     public int id;
     public ArrayList<SnakePart> snake = new ArrayList<>();
@@ -22,11 +22,17 @@ public class Snake {
             return;
         }
 
+        Point next = direction.getNext(snake.get(0).point);
+        if(snake.size()==2 && snake.get(1).point.equals(next)){
+            kill();
+            return;
+        }
+
         for(int i = snake.size()-1; i > 0; i--){
             snake.get(i).point = snake.get(i-1).point;
         }
 
-        snake.get(0).point = direction.getNext(snake.get(0).point);
+        snake.get(0).point = next;
     }
 
     public void kill(){

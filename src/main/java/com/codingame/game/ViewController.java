@@ -60,6 +60,7 @@ public class ViewController {
 
         for(Snake snake : game.snakes){
             parts.add(new SnakeViewPart(snake));
+            parts.add(new PlayerViewPart(snake));
         }
         parts.add(new FoodViewPart(game));
     }
@@ -87,6 +88,112 @@ public class ViewController {
         // returns true if this item is to be persisted.
         boolean onTurn();
     }
+    private static int playerY;
+
+    class PlayerViewPart implements IViewPart{
+        private Snake player;
+        private Rectangle playerFrame;
+        private Text scoreText;
+        private Text playerNameText;
+        private Group group;
+
+        public PlayerViewPart(Snake player){
+            this.player = player;
+            group = module.createGroup()
+                    .setX(25)
+                    .setY(playerY + 50);
+            playerY += module.getWorld().getHeight()/4;
+            playerFrame = module.createRectangle()
+                    .setWidth(module.getWorld().getWidth()/5-50)
+                    .setHeight(module.getWorld().getHeight()/4-100)
+                    .setAlpha(0.0)
+                    .setLineWidth(5)
+                    .setLineColor(gameManager.getPlayer(player.id).getColorToken())
+                    .setFillColor(gameManager.getPlayer(player.id).getColorToken());
+
+            group.add(playerFrame);
+            group.add(module.createRectangle()
+                    .setWidth(module.getWorld().getWidth()/5-50)
+                    .setHeight(module.getWorld().getHeight()/4-100)
+                    .setFillAlpha(0.0)
+                    .setLineWidth(5)
+                    .setLineColor(gameManager.getPlayer(player.id).getColorToken()));
+
+            group.add(playerNameText = module.createText().setText(gameManager.getPlayer(player.id).getNicknameToken())
+                    .setY(15)
+                    .setStrokeColor(0xababab)
+                    .setFillColor(0xffffff)
+                    .setX((module.getWorld().getWidth()/5-50)/2)
+                    .setAnchorX(0.5)
+                    .setAnchorY(0));
+
+            scoreText = module.createText().setText("0")
+                    .setX((module.getWorld().getWidth()/5-50)-50)
+                    .setY((module.getWorld().getHeight()/4-50)/2)
+                    .setStrokeColor(0xababab)
+                    .setFillColor(0xffffff)
+                    .setAnchorY(0.5)
+                    .setFontSize(50)
+                    .setAnchorX(1);
+            group.add(scoreText);
+
+            group.add(module.createSprite().setImage(gameManager.getPlayer(player.id).getAvatarToken())
+                    .setX(25)
+                    .setY((module.getWorld().getHeight()/4-50)/2)
+                    .setAnchorX(0)
+                    .setAnchorY(0.5)
+                    .setBaseHeight(100)
+                    .setBaseWidth(100));
+        }
+
+        @Override
+        public boolean onTurn() {
+            if(game.currentPlayer == player.id) {
+                playerFrame.setAlpha(1.0, Curve.IMMEDIATE);
+                playerNameText
+                        .setStrokeColor(0x000000, Curve.IMMEDIATE)
+                        .setFillColor(0x000000, Curve.IMMEDIATE);
+                scoreText
+                        .setStrokeColor(0x000000, Curve.IMMEDIATE)
+                        .setFillColor(0x000000, Curve.IMMEDIATE);
+            }
+            else {
+                playerFrame.setAlpha(0.0, Curve.IMMEDIATE);
+                playerNameText
+                        .setStrokeColor(0xababab, Curve.IMMEDIATE)
+                        .setFillColor(0xffffff, Curve.IMMEDIATE);
+                scoreText
+                        .setStrokeColor(0xababab, Curve.IMMEDIATE)
+                        .setFillColor(0xffffff, Curve.IMMEDIATE);
+            }
+            module.commitEntityState(0.0, playerFrame);
+            scoreText.setText(player.score+"");
+
+            if(player.isDead){
+                Sprite txt = module.createSprite()
+                        .setImage("cross.png")
+                        .setTint(0xff0000)
+                        .setBaseWidth(120)
+                        .setBaseHeight(120)
+                        .setX(15)
+                        .setScale(0.0)
+                        .setY((module.getWorld().getHeight()/4-50)/2 - 10)
+                        .setAnchorX(0)
+                        .setAnchorY(0.5);
+                group.add(txt);
+                module.commitEntityState(0.0, txt, group);
+                txt.setScale(1.0, Curve.EASE_OUT);
+                playerFrame.setAlpha(0.0, Curve.NONE);
+                playerNameText
+                        .setStrokeColor(0xababab, Curve.NONE)
+                        .setFillColor(0xffffff, Curve.NONE);
+                scoreText
+                        .setStrokeColor(0xababab, Curve.NONE)
+                        .setFillColor(0xffffff, Curve.NONE);
+            }
+            return !player.isDead;
+        }
+    }
 
     class FoodViewPart implements IViewPart{
         private Game game;
@@ -105,7 +212,7 @@ public class ViewController {
                 }
             }
             for(Point food : toRemove){
-                foodMap.get(food).setScale(0, Curve.ELASTIC);
+                foodMap.get(food).setScale(0, Curve.EASE_OUT);
                 foodMap.remove(food);
             }
 
@@ -120,7 +227,7 @@ public class ViewController {
                             .setScale(0);
                     boardGroup.add(foodView);
                     module.commitEntityState(0.0, foodView, boardGroup);
-                    foodView.setScale(1.0, Curve.ELASTIC);
+                    foodView.setScale(1.0, Curve.EASE_OUT);
                     foodMap.put(food, foodView);
                 }
             }
@@ -159,7 +266,9 @@ public class ViewController {
                         .setY(getPos(model.snake.get(i).point.y));
 
                 if(model.isDead){
-                    parts.get(i).setScale(0.0, Curve.ELASTIC);
+                    parts.get(i).setScale(0.0, Curve.EASE_OUT)
+                            .setX((int)(getPos(model.snake.get(i).point.x)+dx/2), Curve.EASE_OUT)
+                            .setY((int)(getPos(model.snake.get(i).point.y)+dy/2), Curve.EASE_OUT);
                 }
             }
 

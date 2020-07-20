@@ -6,10 +6,11 @@ import java.util.Random;
 
 public class Game {
     private Random rnd;
-    private int currentPlayer = -1;
+    public int currentPlayer = -1;
     public ArrayList<Snake> snakes = new ArrayList<>();
     public ArrayList<Point> food = new ArrayList<>();
     private IReferee referee;
+    private int maxTurns;
 
     public Game(int players, IReferee referee, long seed){
         this.referee = referee;
@@ -22,11 +23,11 @@ public class Game {
     }
 
     public void onTurn() {
-        if(countAlivePlayers() < 2){
-            for(Snake snake : snakes){
-                referee.updateScore(snake.id, snake.score);
-            }
+        for(Snake snake : snakes){
+            referee.updateScore(snake.id, snake.score);
+        }
 
+        if(countAlivePlayers() < 2){
             referee.endGame();
             return;
         }
@@ -39,16 +40,24 @@ public class Game {
             SnakeDirection direction = new SnakeDirection(input.trim());
             Point next = direction.getNext(currentSnake.snake.get(0).point);
             currentSnake.move(direction, hasFood(next));
-            if(isCollision(next, currentSnake.snake.get(0))){
-                currentSnake.kill();
+            if(currentSnake.isDead){
+                referee.addTooltip(currentSnake.id, "Died");
+                referee.disablePlayer(currentSnake.id);
             }
-
-            if(hasFood(next)){
+            else if(isCollision(next, currentSnake.snake.get(0))){
+                currentSnake.kill();
+                referee.disablePlayer(currentSnake.id);
+                referee.addTooltip(currentSnake.id, "Died");
+            }
+            else if(hasFood(next)){
                 food.remove(next);
                 spawnFood();
             }
         } catch (Exception e){
-
+            currentSnake.kill();
+            referee.disablePlayer(currentSnake.id);
+            referee.addGameSummary(e.getMessage());
+            referee.addTooltip(currentSnake.id, "Died");
         }
     }
 
@@ -61,6 +70,7 @@ public class Game {
 
         inputs.add(countAlivePlayers() + "");
         for (Snake snake : snakes){
+            if(snake.isDead) continue;
             inputs.add(snake.id + " " +  snake.score + " " + snake.snake.size());
             for(SnakePart part : snake.snake){
                 inputs.add(part.point.x + " " + part.point.y);
@@ -79,11 +89,15 @@ public class Game {
             if(!snakes.get(i).isDead) return i;
         }
 
-        return 0;
+        for(int i = 0; i < snakes.size(); i++){
+            if(!snakes.get(i).isDead) return i;
+        }
+
+        return 0; // should never occur.
     }
 
     private boolean isCollision(Point next, SnakePart head){
-        if(next.x < 0 || next.y < 0 || next.x >= Constants.WIDTH || next.y >= Constants.HEIGHT) return true;
+        if (next.x < 0 || next.y < 0 || next.x >= Constants.WIDTH || next.y >= Constants.HEIGHT) return true;
         return hasSnakePart(next, head);
     }
 
