@@ -16,6 +16,7 @@ public class Game {
     private int maxTurns;
 
     public Game(int players, IReferee referee, long seed){
+        maxTurns = 600/players;
         this.referee = referee;
         rnd = new Random(seed);
         for(int i = 0; i < players; i++){
@@ -36,13 +37,19 @@ public class Game {
         }
 
         currentPlayer = getNextPlayer();
-        String[] output = createInput(currentPlayer);
         Snake currentSnake = snakes.get(currentPlayer);
+        if (currentSnake.turns++ >= maxTurns){
+            referee.endGame();
+            return;
+        }
+
+        String[] output = createInput(currentPlayer);
         try {
             String input = referee.sendInput(currentPlayer, output);
             SnakeDirection direction = new SnakeDirection(input.trim());
             Point next = direction.getNext(currentSnake.snake.get(0).point);
             currentSnake.move(direction, hasFood(next));
+
             if(currentSnake.isDead){
                 referee.addTooltip(currentSnake.id, "Died");
                 referee.disablePlayer(currentSnake.id);
@@ -56,7 +63,7 @@ public class Game {
                 food.remove(next);
                 spawnFood();
             }
-        }catch (AbstractPlayer.TimeoutException e){
+        } catch (AbstractPlayer.TimeoutException e){
             currentSnake.kill();
             referee.disablePlayer(currentSnake.id);
             referee.addGameSummary("Timeout");

@@ -7,6 +7,7 @@ public class Snake {
     private static int deathScore = -3;
     public int score;
     public int id;
+    public int turns;
     public ArrayList<SnakePart> snake = new ArrayList<>();
     public boolean isDead;
     public boolean isInitialized;
