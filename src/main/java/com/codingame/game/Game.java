@@ -65,7 +65,7 @@ public class Game {
             currentSnake.kill();
             referee.disablePlayer(currentSnake.id);
             referee.addGameSummary(e.getMessage());
-            referee.addTooltip(currentSnake.id, "Died");
+            referee.addTooltip(currentSnake.id, "Crashed");
         }
     }
 

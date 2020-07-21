@@ -26,7 +26,7 @@ public class Referee extends AbstractReferee implements IReferee {
         gameManager.setMaxTurns(601);
         gameManager.setTurnMaxTime(50);
         game = new Game(gameManager.getPlayerCount(), this, seed);
-        viewController = new ViewController(game, graphicEntityModule, gameManager);
+        viewController = new ViewController(game, graphicEntityModule, gameManager, tooltipModule);
     }
 
     @Override

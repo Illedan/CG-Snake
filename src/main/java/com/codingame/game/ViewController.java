@@ -3,6 +3,7 @@ package com.codingame.game;
 import com.codingame.gameengine.core.MultiplayerGameManager;
 import com.codingame.gameengine.module.entities.*;
 import com.codingame.gameengine.module.entities.Rectangle;
+import com.codingame.gameengine.module.tooltip.TooltipModule;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -12,15 +13,17 @@ import java.util.HashMap;
 public class ViewController {
     private Game game;
     private GraphicEntityModule module;
+    private TooltipModule tooltipModule;
     private Group boardGroup;
     private double dx;
     private double dy;
     private MultiplayerGameManager<Player> gameManager;
 
     private ArrayList<IViewPart> parts = new ArrayList<>();
-    public ViewController(Game game, GraphicEntityModule module, MultiplayerGameManager<Player> gameManager) {
+    public ViewController(Game game, GraphicEntityModule module, MultiplayerGameManager<Player> gameManager, TooltipModule tooltipModule) {
         this.game = game;
         this.module = module;
+        this.tooltipModule = tooltipModule;
         int height = module.getWorld().getHeight()-50;
         int width = module.getWorld().getWidth()/5*4-50;
 
@@ -48,6 +51,17 @@ public class ViewController {
                     .setLineColor(0xababab)
                     .setX(0).setX2(getPos(Constants.WIDTH))
                     .setY(getPos(i)).setY2(getPos(i)));
+            for(int x = 0; x < Constants.WIDTH; x++){
+                if(i >= Constants.HEIGHT) break;
+                Rectangle cell = module.createRectangle()
+                        .setWidth((int)dx)
+                        .setHeight((int)dy)
+                        .setX(getPos(x))
+                        .setY(getPos(i))
+                        .setAlpha(0);
+                tooltipModule.setTooltipText(cell, "x: " + x + "\ny: " + i);
+                boardGroup.add(cell);
+            }
         }
 
         for(int i = 0; i < Constants.WIDTH + 1; i++){
@@ -259,6 +273,7 @@ public class ViewController {
                 boardGroup.add(rect);
                 module.commitEntityState(0.0, rect);
                 parts.add(0, rect);
+                tooltipModule.setTooltipText(rect, "PlayerId: " + model.id);
             }
 
             for(int i = 0; i < model.snake.size(); i++){
