@@ -43,7 +43,7 @@ class MainClass
                 var snake = inputs[3].Split(',').Select(int.Parse).ToArray();
                 var s = new Snake(id, score);
                 snakes.Add(s);
-                for(var j = 0; j < size; j+=2){
+                for(var j = 0; j < size*2; j+=2){
                     s.Positions.Add(new Position(snake[j], snake[j+1]));
                     Board[snake[j], snake[j+1]] = true;
                 }
@@ -62,6 +62,8 @@ class MainClass
             var str = new string[]{"W", "E", "N",  "S"};
             var me = snakes.First(s => s.Id == MYID);
             var head = me.Positions.First();
+            var bestScore = 1000;
+            var best = str[0];
             for(var i = 0; i < 4; i++){
                 var x = head.X+dx[i];
                 var y = head.Y+dy[i];
@@ -69,9 +71,16 @@ class MainClass
                     continue;
                 }
                 if (Board[x,y]) continue;
-                Console.WriteLine(str[i]);
-                break;
+                var p = new Position(x, y);
+                var closeFood = food.OrderBy(f => f.Dist2(p)).First();
+                Console.Error.WriteLine("Testing: " + x + " " + y + " " + closeFood.Dist2(p));
+                if(closeFood.Dist2(p) < bestScore){
+                    best = str[i];
+                    bestScore = closeFood.Dist2(p);
+                }
             }
+
+            Console.WriteLine(best);
         }
     }
 }
@@ -91,4 +100,7 @@ class Position{
         X = x;
         Y = y;
     }
+
+    public int Pow(int x) => x*x;
+    public int Dist2(Position p2) => Math.Abs(p2.X-X) + Math.Abs(p2.Y-Y);
 }
