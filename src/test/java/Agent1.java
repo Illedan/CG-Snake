@@ -9,7 +9,18 @@ public class Agent1 {
         Random rnd = new Random();
         String[] poss = new String[]{ "S", "N", "W", "E"};
         while (true) {
-            String input = scanner.nextLine();
+            int alive = scanner.nextInt();
+            System.err.println(alive);
+            for(int i = 0; i < alive; i++){
+                String input = scanner.nextLine();
+                System.err.println(input);
+            }
+
+            for(int i = 0; i < 30; i++){
+                String input = scanner.nextLine();
+                System.err.println(input);
+            }
+
             System.out.println(poss[rnd.nextInt(4)]);
         }
     }

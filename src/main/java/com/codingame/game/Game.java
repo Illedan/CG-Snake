@@ -1,7 +1,10 @@
 package com.codingame.game;
 
+import com.codingame.gameengine.core.AbstractPlayer;
+
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class Game {
@@ -53,6 +56,11 @@ public class Game {
                 food.remove(next);
                 spawnFood();
             }
+        }catch (AbstractPlayer.TimeoutException e){
+            currentSnake.kill();
+            referee.disablePlayer(currentSnake.id);
+            referee.addGameSummary("Timeout");
+            referee.addTooltip(currentSnake.id, "Timeout!");
         } catch (Exception e){
             currentSnake.kill();
             referee.disablePlayer(currentSnake.id);
@@ -71,16 +79,14 @@ public class Game {
         inputs.add(countAlivePlayers() + "");
         for (Snake snake : snakes){
             if(snake.isDead) continue;
-            inputs.add(snake.id + " " +  snake.score + " " + snake.snake.size());
-            for(SnakePart part : snake.snake){
-                inputs.add(part.point.x + " " + part.point.y);
-            }
+            inputs.add(snake.id + " " +  snake.score + " " + snake.snake.size() + " " + String.join(",",
+                    Arrays.asList(snake.snake.stream().map(s -> s.point.x + "," + s.point.y).toArray()).toArray(new String[snake.snake.size()])));
         }
 
         for (Point food : food){
             inputs.add(food.x + " " + food.y);
         }
-
+        currentSnake.isInitialized = true;
         return GetStringArray(inputs);
     }
 

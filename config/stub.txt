@@ -3,4 +3,8 @@ read width:int height:int playercount:int foodcount:int myid:int
 gameloop
 
 read aliveplayers:int
-loop aliveplayers read
+loop aliveplayers read id:int score:int size:int snake:word(400)
+loop foodcount read x:int y:int
+
+STATEMENT
+Made by Illedan for Runar.
