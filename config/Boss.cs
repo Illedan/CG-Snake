@@ -12,7 +12,7 @@ class MainClass
 {
     private static int MYID;
     private static bool[,] Board;
-    static void Main()
+    public static void Main(string[] args)
     {
         string[] inputs;
         inputs = Console.ReadLine().Split(' ');
@@ -62,7 +62,7 @@ class MainClass
             var str = new string[]{"W", "E", "N",  "S"};
             var me = snakes.First(s => s.Id == MYID);
             var head = me.Positions.First();
-            var bestScore = 1000;
+            var bestScore = 1000.0;
             var best = str[0];
             for(var i = 0; i < 4; i++){
                 var x = head.X+dx[i];
@@ -73,10 +73,22 @@ class MainClass
                 if (Board[x,y]) continue;
                 var p = new Position(x, y);
                 var closeFood = food.OrderBy(f => f.Dist2(p)).First();
-                Console.Error.WriteLine("Testing: " + x + " " + y + " " + closeFood.Dist2(p));
-                if(closeFood.Dist2(p) < bestScore){
+                var score = closeFood.Dist2(p)+ 0.0;
+                foreach(var f in food){
+                    score += f.Dist2(p)*0.001;
+                }
+                for(var j = 0; j < 4;j++){
+                    var xx = dx[j]+x;
+                    var yy = dy[j]+y;
+                     if (xx < 0 || yy < 0 || xx >= width || yy >= height){
+                        continue;
+                    }
+                    if (Board[xx,yy]) continue;
+                    score-=5;
+                }
+                if(score < bestScore){
                     best = str[i];
-                    bestScore = closeFood.Dist2(p);
+                    bestScore = score;
                 }
             }
 

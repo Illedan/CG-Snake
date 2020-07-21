@@ -29,3 +29,6 @@ hs_err_pid*
 /.classpath
 **.DS_Store
 **.idea
+**/.vs/**
+**/bin/**
+**/obj/**

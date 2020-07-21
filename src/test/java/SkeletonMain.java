@@ -17,14 +17,15 @@ public class SkeletonMain {
         MultiplayerGameRunner gameRunner = new MultiplayerGameRunner();
 
         // Adds as many player as you need to test your game
-        gameRunner.addAgent(Agent1.class);
-        gameRunner.addAgent(Agent1.class);
-        gameRunner.addAgent(Agent1.class);
-        gameRunner.addAgent(Agent1.class);
+       // gameRunner.addAgent(Agent1.class);
+       // gameRunner.addAgent(Agent1.class);
+       // gameRunner.addAgent(Agent1.class);
+       // gameRunner.addAgent(Agent1.class);
 
         // Another way to add a player
-        // gameRunner.addAgent("python3 /home/user/player.py");
-        
+        gameRunner.addAgent("dotnet run --project /Users/erikkvanli/Repos/CG-Snake/config/BossProj/BossProj.csproj ");
+        gameRunner.addAgent("dotnet run --project /Users/erikkvanli/Repos/CG-Snake/config/BossProj/BossProj.csproj ");
+        gameRunner.addAgent("dotnet run --project /Users/erikkvanli/Repos/CG-Snake/config/BossProj/BossProj.csproj ");
 
         gameRunner.start();
     }
