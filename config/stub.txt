@@ -5,6 +5,7 @@ gameloop
 read aliveplayers:int
 loop aliveplayers read id:int score:int size:int snake:word(800)
 loop foodcount read x:int y:int
+write N
 
 STATEMENT
-Made by Illedan for Runar.
+Made by Illedan for Hjerpbakk.
