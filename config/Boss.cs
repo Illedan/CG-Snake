@@ -12,7 +12,7 @@ class MainClass
 {
     private static int MYID;
     private static bool[,] Board;
-    public static void Main(string[] args)
+    static void Main()
     {
         string[] inputs;
         inputs = Console.ReadLine().Split(' ');
@@ -75,12 +75,13 @@ class MainClass
                 var closeFood = food.OrderBy(f => f.Dist2(p)).First();
                 var score = closeFood.Dist2(p)+ 0.0;
                 foreach(var f in food){
-                    score += f.Dist2(p)*0.001;
+                    //score += f.Dist2(p)*0.0000001;
                 }
                 for(var j = 0; j < 4;j++){
                     var xx = dx[j]+x;
                     var yy = dy[j]+y;
                      if (xx < 0 || yy < 0 || xx >= width || yy >= height){
+                         score -=4;
                         continue;
                     }
                     if (Board[xx,yy]) continue;

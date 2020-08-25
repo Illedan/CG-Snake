@@ -79,7 +79,7 @@ public class ViewController {
         parts.add(new FoodViewPart(game));
     }
 
-    private int getPos(int pos){
+    private int getPos(double pos){
         return (int)(dx*pos);
     }
 
@@ -236,8 +236,8 @@ public class ViewController {
                             .setFillColor(0x87821a)
                             .setLineColor(0x000000)
                             .setRadius((int)(dx/2.5))
-                            .setX((int)(getPos(food.x)+dx*0.5))
-                            .setY((int)(getPos(food.y)+dy*0.5))
+                            .setX((int)(getPos(food.x+0.5)))
+                            .setY((int)(getPos(food.y+0.5)))
                             .setScale(0);
                     boardGroup.add(foodView);
                     module.commitEntityState(0.0, foodView, boardGroup);
@@ -252,7 +252,7 @@ public class ViewController {
 
     class SnakeViewPart implements IViewPart {
         private Snake model;
-        private ArrayList<Rectangle> parts = new ArrayList<>();
+        private ArrayList<Circle> parts = new ArrayList<>();
         public SnakeViewPart(Snake model){
             this.model = model;
             onTurn();
@@ -261,14 +261,13 @@ public class ViewController {
         public boolean onTurn() {
             if(parts.size() != model.snake.size()){
                 Point point = model.snake.get(0).point;
-                Rectangle rect = module.createRectangle()
-                        .setWidth((int)dx)
-                        .setHeight((int)dy)
+                Circle rect = module.createCircle()
+                        .setRadius((int)(dx/2.5))
                         .setFillColor(gameManager.getPlayer(model.id).getColorToken())
                         .setLineColor(0xababab)
                         .setLineWidth(1)
-                        .setX((int)(getPos(point.x)))
-                        .setY((int)(getPos(point.y)))
+                        .setX((int)(getPos(point.x+0.5)))
+                        .setY((int)(getPos(point.y+0.5)))
                         .setZIndex(1);
                 boardGroup.add(rect);
                 module.commitEntityState(0.0, rect);
@@ -277,13 +276,11 @@ public class ViewController {
             }
 
             for(int i = 0; i < model.snake.size(); i++){
-                parts.get(i).setX(getPos(model.snake.get(i).point.x))
-                        .setY(getPos(model.snake.get(i).point.y));
+                parts.get(i).setX(getPos(model.snake.get(i).point.x+0.5))
+                        .setY(getPos(model.snake.get(i).point.y+0.5));
 
                 if(model.isDead){
-                    parts.get(i).setScale(0.0, Curve.EASE_OUT)
-                            .setX((int)(getPos(model.snake.get(i).point.x)+dx/2), Curve.EASE_OUT)
-                            .setY((int)(getPos(model.snake.get(i).point.y)+dy/2), Curve.EASE_OUT);
+                    parts.get(i).setScale(0.0, Curve.EASE_OUT);
                 }
             }
 
