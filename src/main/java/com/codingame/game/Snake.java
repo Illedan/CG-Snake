@@ -11,6 +11,7 @@ public class Snake {
     public ArrayList<SnakePart> snake = new ArrayList<>();
     public boolean isDead;
     public boolean isInitialized;
+    public String message = "";
     public Snake(int id, Point spawn){
         this.id = id;
         snake.add(new SnakePart(spawn));

@@ -46,9 +46,14 @@ public class Game {
         String[] output = createInput(currentPlayer);
         try {
             String input = referee.sendInput(currentPlayer, output);
-            SnakeDirection direction = new SnakeDirection(input.trim());
+            SnakeDirection direction = new SnakeDirection(input.trim().charAt(0)+"");
             Point next = direction.getNext(currentSnake.snake.get(0).point);
             currentSnake.move(direction, hasFood(next));
+            if(input.length() > 2){
+                currentSnake.message = input.substring(1);
+            }else{
+                currentSnake.message = "";
+            }
 
             if(currentSnake.isDead){
                 referee.addTooltip(currentSnake.id, "Died");

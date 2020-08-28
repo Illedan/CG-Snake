@@ -110,6 +110,7 @@ public class ViewController {
         private Text scoreText;
         private Text playerNameText;
         private Group group;
+        private Text messageText;
 
         public PlayerViewPart(Snake player){
             this.player = player;
@@ -119,7 +120,7 @@ public class ViewController {
             playerY += module.getWorld().getHeight()/4;
             playerFrame = module.createRectangle()
                     .setWidth(module.getWorld().getWidth()/5-50)
-                    .setHeight(module.getWorld().getHeight()/4-100)
+                    .setHeight(module.getWorld().getHeight()/4-75)
                     .setAlpha(0.0)
                     .setLineWidth(5)
                     .setLineColor(gameManager.getPlayer(player.id).getColorToken())
@@ -128,7 +129,7 @@ public class ViewController {
             group.add(playerFrame);
             group.add(module.createRectangle()
                     .setWidth(module.getWorld().getWidth()/5-50)
-                    .setHeight(module.getWorld().getHeight()/4-100)
+                    .setHeight(module.getWorld().getHeight()/4-75)
                     .setFillAlpha(0.0)
                     .setLineWidth(5)
                     .setLineColor(gameManager.getPlayer(player.id).getColorToken()));
@@ -158,6 +159,16 @@ public class ViewController {
                     .setAnchorY(0.5)
                     .setBaseHeight(100)
                     .setBaseWidth(100));
+
+            group.add(messageText = module.createText().setText("")
+                    .setX((module.getWorld().getWidth()/5-50)/2)
+                    .setY(module.getWorld().getHeight()/4-85)
+                    .setAnchorY(1)
+                    .setAnchorX(0.5)
+                    .setFontSize(20)
+                    .setStrokeColor(0xababab)
+                    .setFillColor(0xffffff)
+                    );
         }
 
         @Override
@@ -170,6 +181,9 @@ public class ViewController {
                 scoreText
                         .setStrokeColor(0x000000, Curve.IMMEDIATE)
                         .setFillColor(0x000000, Curve.IMMEDIATE);
+                messageText
+                        .setStrokeColor(0x000000, Curve.IMMEDIATE)
+                        .setFillColor(0x000000, Curve.IMMEDIATE);
             }
             else {
                 playerFrame.setAlpha(0.0, Curve.IMMEDIATE);
@@ -179,9 +193,17 @@ public class ViewController {
                 scoreText
                         .setStrokeColor(0xababab, Curve.IMMEDIATE)
                         .setFillColor(0xffffff, Curve.IMMEDIATE);
+                messageText
+                        .setStrokeColor(0xababab, Curve.IMMEDIATE)
+                        .setFillColor(0xffffff, Curve.IMMEDIATE);
             }
             module.commitEntityState(0.0, playerFrame);
             scoreText.setText(player.score+"");
+            if(player.message.length() > 25)
+                messageText.setText(player.message.substring(0, 24));
+            else
+            messageText.setText(player.message);
+            module.commitEntityState(0, messageText);
 
             if(player.isDead){
                 Sprite txt = module.createSprite()
@@ -202,6 +224,9 @@ public class ViewController {
                         .setStrokeColor(0xababab, Curve.NONE)
                         .setFillColor(0xffffff, Curve.NONE);
                 scoreText
+                        .setStrokeColor(0xababab, Curve.NONE)
+                        .setFillColor(0xffffff, Curve.NONE);
+                messageText
                         .setStrokeColor(0xababab, Curve.NONE)
                         .setFillColor(0xffffff, Curve.NONE);
             }
@@ -241,7 +266,7 @@ public class ViewController {
                             .setScale(0);
                     boardGroup.add(foodView);
                     module.commitEntityState(0.0, foodView, boardGroup);
-                    foodView.setScale(1.0, Curve.EASE_OUT);
+                    foodView.setScale(1.0, Curve.IMMEDIATE);
                     foodMap.put(food, foodView);
                 }
             }

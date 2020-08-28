@@ -7,7 +7,7 @@ public class Agent1 {
         String def = scanner.nextLine();
         System.err.println(def);
         Random rnd = new Random();
-        String[] poss = new String[]{ "S",  "E"};
+        String[] poss = new String[]{ "S",  "EMELDING HER? yololololo gra gra grae grae"};
         int i = 0;
         while (true) {
             System.out.println(poss[rnd.nextInt(2)]);
