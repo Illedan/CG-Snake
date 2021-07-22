@@ -1,4 +1,5 @@
 import com.codingame.gameengine.runner.MultiplayerGameRunner;
+import com.codingame.gameengine.runner.SoloGameRunner;
 
 public class SkeletonMain {
     public static void main(String[] args) {
@@ -14,13 +15,11 @@ public class SkeletonMain {
         // gameRunner.setTestCase("test1.json");
 
         /* Multiplayer Game */
-        MultiplayerGameRunner gameRunner = new MultiplayerGameRunner();
+        SoloGameRunner gameRunner = new SoloGameRunner();
 
         // Adds as many player as you need to test your game
-        gameRunner.addAgent(Agent1.class);
-        gameRunner.addAgent(Agent1.class);
-        gameRunner.addAgent(Agent1.class);
-        gameRunner.addAgent(Agent1.class);
+        gameRunner.setAgent(Agent1.class);
+        gameRunner.setTestCase("test1.json");
 
         // Another way to add a player
         //gameRunner.addAgent("dotnet run --project /Users/erikkvanli/Repos/CG-Snake/config/BossProj/BossProj.csproj ");

@@ -1,6 +1,7 @@
 package com.codingame.game;
 
 import com.codingame.gameengine.core.AbstractPlayer;
+import com.codingame.gameengine.core.SoloGameManager;
 import com.codingame.gameengine.module.endscreen.EndScreenModule;
 import com.codingame.gameengine.module.entities.GraphicEntityModule;
 import com.codingame.gameengine.core.AbstractReferee;
@@ -12,28 +13,30 @@ import javax.swing.text.View;
 import java.util.Arrays;
 
 public class Referee extends AbstractReferee implements IReferee {
-    @Inject private MultiplayerGameManager<Player> gameManager;
+    @Inject private SoloGameManager<Player> gameManager;
     @Inject private GraphicEntityModule graphicEntityModule;
     @Inject private EndScreenModule endScreenModule;
     @Inject private TooltipModule tooltipModule;
     private Game game;
     private ViewController viewController;
+    private double score;
 
     @Override
     public void init() {
-        long seed = gameManager.getSeed();
+        long seed = Integer.parseInt(gameManager.getTestCaseInput().get(0));;
         gameManager.setFrameDuration(500);
         gameManager.setMaxTurns(601);
         gameManager.setTurnMaxTime(50);
-        game = new Game(gameManager.getPlayerCount(), this, seed);
+        game = new Game(this, seed);
         viewController = new ViewController(game, graphicEntityModule, gameManager, tooltipModule);
     }
 
     @Override
     public void onEnd() {
-        int[] scores = gameManager.getPlayers().stream().mapToInt(p -> p.getScore()).toArray();
-        String[] texts = Arrays.asList(gameManager.getPlayers().stream().map(p -> p.getScore()+"").toArray()).toArray(new String[game.snakes.size()]);;
-        endScreenModule.setScores(scores, texts);
+        gameManager.putMetadata("Points", String.valueOf(score));
+        gameManager.winGame("score: " + score);
+
+        endScreenModule.setScores(new int[]{(int)score}, new String[]{ String.valueOf(score) });
         endScreenModule.setTitleRankingsSprite("logo.png");
     }
 
@@ -45,8 +48,8 @@ public class Referee extends AbstractReferee implements IReferee {
     }
 
     @Override
-    public String sendInput(int player, String[] inputs)  throws AbstractPlayer.TimeoutException{
-        Player p = gameManager.getPlayer(player);
+    public String sendInput(String[] inputs)  throws AbstractPlayer.TimeoutException{
+        Player p = gameManager.getPlayer();
         for(String s : inputs){
             p.sendInputLine(s);
         }
@@ -56,13 +59,8 @@ public class Referee extends AbstractReferee implements IReferee {
     }
 
     @Override
-    public void disablePlayer(int player) {
-        gameManager.getPlayer(player).deactivate();
-    }
-
-    @Override
-    public void updateScore(int player, int score) {
-        gameManager.getPlayer(player).setScore(score);
+    public void updateScore(double score) {
+        this.score = score;
     }
 
     @Override
@@ -71,12 +69,12 @@ public class Referee extends AbstractReferee implements IReferee {
     }
 
     @Override
-    public void addTooltip(int player, String message) {
-        gameManager.addTooltip(gameManager.getPlayer(player), message);
+    public void addTooltip(String message) {
+        gameManager.addTooltip(gameManager.getPlayer(), message);
     }
 
     @Override
     public void endGame() {
-        gameManager.endGame();
+        gameManager.winGame("score: " + score);
     }
 }

@@ -1,6 +1,7 @@
 package com.codingame.game;
 
 import com.codingame.gameengine.core.MultiplayerGameManager;
+import com.codingame.gameengine.core.SoloGameManager;
 import com.codingame.gameengine.module.entities.*;
 import com.codingame.gameengine.module.entities.Rectangle;
 import com.codingame.gameengine.module.tooltip.TooltipModule;
@@ -17,10 +18,11 @@ public class ViewController {
     private Group boardGroup;
     private double dx;
     private double dy;
-    private MultiplayerGameManager<Player> gameManager;
+    private SoloGameManager<Player> gameManager;
+    private int red = 0xff0000;
 
     private ArrayList<IViewPart> parts = new ArrayList<>();
-    public ViewController(Game game, GraphicEntityModule module, MultiplayerGameManager<Player> gameManager, TooltipModule tooltipModule) {
+    public ViewController(Game game, GraphicEntityModule module, SoloGameManager<Player> gameManager, TooltipModule tooltipModule) {
         this.game = game;
         this.module = module;
         this.tooltipModule = tooltipModule;
@@ -110,7 +112,6 @@ public class ViewController {
         private Text scoreText;
         private Text playerNameText;
         private Group group;
-        private Text messageText;
 
         public PlayerViewPart(Snake player){
             this.player = player;
@@ -123,8 +124,8 @@ public class ViewController {
                     .setHeight(module.getWorld().getHeight()/4-75)
                     .setAlpha(0.0)
                     .setLineWidth(5)
-                    .setLineColor(gameManager.getPlayer(player.id).getColorToken())
-                    .setFillColor(gameManager.getPlayer(player.id).getColorToken());
+                    .setLineColor(red)
+                    .setFillColor(0xffffff);
 
             group.add(playerFrame);
             group.add(module.createRectangle()
@@ -132,9 +133,9 @@ public class ViewController {
                     .setHeight(module.getWorld().getHeight()/4-75)
                     .setFillAlpha(0.0)
                     .setLineWidth(5)
-                    .setLineColor(gameManager.getPlayer(player.id).getColorToken()));
+                    .setLineColor(red));
 
-            group.add(playerNameText = module.createText().setText(gameManager.getPlayer(player.id).getNicknameToken())
+            group.add(playerNameText = module.createText().setText(gameManager.getPlayer().getNicknameToken())
                     .setY(15)
                     .setStrokeColor(0xababab)
                     .setFillColor(0xffffff)
@@ -152,7 +153,7 @@ public class ViewController {
                     .setAnchorX(1);
             group.add(scoreText);
 
-            group.add(module.createSprite().setImage(gameManager.getPlayer(player.id).getAvatarToken())
+            group.add(module.createSprite().setImage(gameManager.getPlayer().getAvatarToken())
                     .setX(25)
                     .setY((module.getWorld().getHeight()/4-50)/2)
                     .setAnchorX(0)
@@ -160,51 +161,20 @@ public class ViewController {
                     .setBaseHeight(100)
                     .setBaseWidth(100));
 
-            group.add(messageText = module.createText().setText("")
-                    .setX((module.getWorld().getWidth()/5-50)/2)
-                    .setY(module.getWorld().getHeight()/4-85)
-                    .setAnchorY(1)
-                    .setAnchorX(0.5)
-                    .setFontSize(20)
-                    .setStrokeColor(0xababab)
-                    .setFillColor(0xffffff)
-                    );
+
+            playerFrame.setAlpha(0.25, Curve.IMMEDIATE);
+            playerNameText
+                    .setStrokeColor(0x000000, Curve.IMMEDIATE)
+                    .setFillColor(0x000000, Curve.IMMEDIATE);
+            scoreText
+                    .setStrokeColor(0x000000, Curve.IMMEDIATE)
+                    .setFillColor(0x000000, Curve.IMMEDIATE);
+
         }
 
         @Override
         public boolean onTurn() {
-            if(game.currentPlayer == player.id) {
-                playerFrame.setAlpha(1.0, Curve.IMMEDIATE);
-                playerNameText
-                        .setStrokeColor(0x000000, Curve.IMMEDIATE)
-                        .setFillColor(0x000000, Curve.IMMEDIATE);
-                scoreText
-                        .setStrokeColor(0x000000, Curve.IMMEDIATE)
-                        .setFillColor(0x000000, Curve.IMMEDIATE);
-                messageText
-                        .setStrokeColor(0x000000, Curve.IMMEDIATE)
-                        .setFillColor(0x000000, Curve.IMMEDIATE);
-            }
-            else {
-                playerFrame.setAlpha(0.0, Curve.IMMEDIATE);
-                playerNameText
-                        .setStrokeColor(0xababab, Curve.IMMEDIATE)
-                        .setFillColor(0xffffff, Curve.IMMEDIATE);
-                scoreText
-                        .setStrokeColor(0xababab, Curve.IMMEDIATE)
-                        .setFillColor(0xffffff, Curve.IMMEDIATE);
-                messageText
-                        .setStrokeColor(0xababab, Curve.IMMEDIATE)
-                        .setFillColor(0xffffff, Curve.IMMEDIATE);
-            }
-            module.commitEntityState(0.0, playerFrame);
             scoreText.setText(player.score+"");
-            if(player.message.length() > 25)
-                messageText.setText(player.message.substring(0, 24));
-            else
-            messageText.setText(player.message);
-            module.commitEntityState(0, messageText);
-
             if(player.isDead){
                 Sprite txt = module.createSprite()
                         .setImage("cross.png")
@@ -224,9 +194,6 @@ public class ViewController {
                         .setStrokeColor(0xababab, Curve.NONE)
                         .setFillColor(0xffffff, Curve.NONE);
                 scoreText
-                        .setStrokeColor(0xababab, Curve.NONE)
-                        .setFillColor(0xffffff, Curve.NONE);
-                messageText
                         .setStrokeColor(0xababab, Curve.NONE)
                         .setFillColor(0xffffff, Curve.NONE);
             }
@@ -288,7 +255,7 @@ public class ViewController {
                 Point point = model.snake.get(0).point;
                 Circle rect = module.createCircle()
                         .setRadius((int)(dx/2.5))
-                        .setFillColor(gameManager.getPlayer(model.id).getColorToken())
+                        .setFillColor(red)
                         .setLineColor(0xababab)
                         .setLineWidth(1)
                         .setX((int)(getPos(point.x+0.5)))

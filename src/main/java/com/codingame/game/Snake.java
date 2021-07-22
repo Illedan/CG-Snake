@@ -4,14 +4,12 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class Snake {
-    private static int deathScore = -3;
     public int score;
     public int id;
     public int turns;
     public ArrayList<SnakePart> snake = new ArrayList<>();
     public boolean isDead;
     public boolean isInitialized;
-    public String message = "";
     public Snake(int id, Point spawn){
         this.id = id;
         snake.add(new SnakePart(spawn));
@@ -39,6 +37,5 @@ public class Snake {
 
     public void kill(){
         isDead = true;
-        score = deathScore++;
     }
 }

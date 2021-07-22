@@ -9,89 +9,90 @@ import java.util.Random;
 
 public class Game {
     private Random rnd;
-    public int currentPlayer = -1;
+    public int currentPlayer = 0;
     public ArrayList<Snake> snakes = new ArrayList<>();
     public ArrayList<Point> food = new ArrayList<>();
     private IReferee referee;
     private int maxTurns;
-
-    public Game(int players, IReferee referee, long seed){
-        maxTurns = 600/players;
+    private int numSteps;
+    private long seed;
+    private long secretSeed = 1337L; // This seed is to make local replication harder ;)
+    private int maxFood;
+    public Game(IReferee referee, long seed){ // This code is written for a multiplayer game. Lazy factorization to published.
+        maxTurns = 600;
         this.referee = referee;
-        rnd = new Random(seed);
-        for(int i = 0; i < players; i++){
+        this.seed = seed;
+        rnd = new Random(seed ^ secretSeed);
+        maxFood = rnd.nextInt( Constants.MAX_FOOD - 2) + 3;
+        for(int i = 0; i < 1; i++){
             snakes.add(new Snake(i, findRandomEmpty()));
         }
 
-        spawnFood();
+        spawnInitialFood();
     }
 
     public void onTurn() {
         for(Snake snake : snakes){
-            referee.updateScore(snake.id, snake.score);
+            referee.updateScore(snake.score);
         }
 
-        if(countAlivePlayers() < 2){
+        Snake currentSnake = snakes.get(0);
+        if (currentSnake.turns++ >= maxTurns || numSteps > 25000 || currentSnake.snake.size() == 600){
             referee.endGame();
             return;
         }
 
-        currentPlayer = getNextPlayer();
-        Snake currentSnake = snakes.get(currentPlayer);
-        if (currentSnake.turns++ >= maxTurns){
-            referee.endGame();
-            return;
-        }
-
-        String[] output = createInput(currentPlayer);
+        String[] output = createInput();
         try {
-            String input = referee.sendInput(currentPlayer, output);
-            SnakeDirection direction = new SnakeDirection(input.trim().charAt(0)+"");
-            Point next = direction.getNext(currentSnake.snake.get(0).point);
-            currentSnake.move(direction, hasFood(next));
-            if(input.length() > 2){
-                currentSnake.message = input.substring(1);
-            }else{
-                currentSnake.message = "";
+            String input = referee.sendInput(output);
+
+            for(char dir: input.trim().toCharArray()){
+                SnakeDirection direction = new SnakeDirection(dir+"");
+                numSteps++;
+                Point next = direction.getNext(currentSnake.snake.get(0).point);
+                currentSnake.move(direction, hasFood(next));
+
+                if(currentSnake.isDead){
+                    EndGame();
+                }
+                else if(isCollision(next, currentSnake.snake.get(0))){
+                    currentSnake.kill();
+                    EndGame();
+                }
+                else if(hasFood(next)){
+                    food.remove(next);
+                    spawnFood();
+                }
             }
 
-            if(currentSnake.isDead){
-                referee.addTooltip(currentSnake.id, "Died");
-                referee.disablePlayer(currentSnake.id);
-            }
-            else if(isCollision(next, currentSnake.snake.get(0))){
-                currentSnake.kill();
-                referee.disablePlayer(currentSnake.id);
-                referee.addTooltip(currentSnake.id, "Died");
-            }
-            else if(hasFood(next)){
-                food.remove(next);
-                spawnFood();
-            }
         } catch (AbstractPlayer.TimeoutException e){
-            currentSnake.kill();
-            referee.disablePlayer(currentSnake.id);
             referee.addGameSummary("Timeout");
-            referee.addTooltip(currentSnake.id, "Timeout!");
+            referee.addTooltip("Timeout");
+            EndGame();
         } catch (Exception e){
-            currentSnake.kill();
-            referee.disablePlayer(currentSnake.id);
             referee.addGameSummary(e.getMessage());
-            referee.addTooltip(currentSnake.id, "Crashed");
+            EndGame();
+            referee.addTooltip("Crashed - Check game summary");
         }
     }
 
-    private String[] createInput(int player){
-        Snake currentSnake = snakes.get(player);
+    private void EndGame(){
+        double score = snakes.get(0).score +(snakes.get(0).score==600?+ 5 - numSteps/5000.0:0); // 5x5000 => 25000 => Max number of steps. Please don't go in circles to burn CG CPU.
+        referee.updateScore(score);
+        referee.endGame();
+    }
+
+    private String[] createInput(){
+        Snake currentSnake = snakes.get(0);
         ArrayList<String> inputs = new ArrayList<>();
         if (!currentSnake.isInitialized){
-            inputs.add(Constants.WIDTH + " " + Constants.HEIGHT + " " + snakes.size() + " " + Constants.MAX_FOOD + " " + player);
+            inputs.add(Constants.WIDTH + " " + Constants.HEIGHT + " " + maxFood);
         }
 
-        inputs.add(countAlivePlayers() + "");
+        inputs.add(seed + "");
         for (Snake snake : snakes){
             if(snake.isDead) continue;
-            inputs.add(snake.id + " " +  snake.score + " " + snake.snake.size() + " " + String.join(",",
+            inputs.add(snake.score + " " + snake.snake.size() + " " + String.join(",",
                     Arrays.asList(snake.snake.stream().map(s -> s.point.x + "," + s.point.y).toArray()).toArray(new String[snake.snake.size()])));
         }
 
@@ -103,15 +104,7 @@ public class Game {
     }
 
     private int getNextPlayer(){
-        for(int i = currentPlayer + 1; i < snakes.size(); i++){
-            if(!snakes.get(i).isDead) return i;
-        }
-
-        for(int i = 0; i < snakes.size(); i++){
-            if(!snakes.get(i).isDead) return i;
-        }
-
-        return 0; // should never occur.
+        return 0;
     }
 
     private boolean isCollision(Point next, SnakePart head){
@@ -146,10 +139,26 @@ public class Game {
         return false;
     }
 
-    private void spawnFood(){
-        while(food.size() < Constants.MAX_FOOD){
+    private void spawnInitialFood(){
+        while(food.size() < maxFood){
             food.add(findRandomEmpty());
         }
+    }
+
+    private void spawnFood() {
+        if(food.size() >= maxFood) return;
+        ArrayList<Point> freeCells = new ArrayList<>();
+        for (int x = 0; x < Constants.WIDTH; x++) {
+            for (int y = 0; y < Constants.HEIGHT; y++) {
+                Point p = new Point(x, y);
+                if(hasFood(p) || hasSnakePart(p)) continue;
+                freeCells.add(p);
+            }
+        }
+        if(freeCells.size() == 0) return;
+        Point spawnIndex = freeCells.get((int) seed % freeCells.size());
+        food.add(spawnIndex);
+        seed = seed * seed % 50515093L;
     }
 
     private boolean hasSnakePart(Point point, SnakePart ignoredPart){
