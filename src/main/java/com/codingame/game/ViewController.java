@@ -211,6 +211,7 @@ public class ViewController {
 
         @Override
         public boolean onTurn() {
+            if(game.numSteps > 1000) return true;
             ArrayList<Point> toRemove = new ArrayList<>();
             for(Point food : foodMap.keySet()){
                 if(!game.food.contains(food)){
@@ -230,10 +231,9 @@ public class ViewController {
                             .setRadius((int)(dx/2.5))
                             .setX((int)(getPos(food.x+0.5)))
                             .setY((int)(getPos(food.y+0.5)))
-                            .setScale(0);
+                            .setScale(1.0);
                     boardGroup.add(foodView);
                     module.commitEntityState(0.0, foodView, boardGroup);
-                    foodView.setScale(1.0, Curve.IMMEDIATE);
                     foodMap.put(food, foodView);
                 }
             }
@@ -245,34 +245,36 @@ public class ViewController {
     class SnakeViewPart implements IViewPart {
         private Snake model;
         private ArrayList<Circle> parts = new ArrayList<>();
+        private Circle[][] circles = new Circle[Constants.WIDTH][Constants.HEIGHT];
         public SnakeViewPart(Snake model){
             this.model = model;
+            for(int x = 0; x < Constants.WIDTH; x++){
+                for(int y = 0; y < Constants.HEIGHT; y++){
+                    Point point = new Point(x, y);
+                    Circle circle = module.createCircle()
+                            .setRadius((int)(dx/2.5))
+                            .setFillColor(red)
+                            .setLineColor(0xababab)
+                            .setLineWidth(1)
+                            .setAlpha(0.0)
+                            .setX((int)(getPos(point.x+0.5)))
+                            .setY((int)(getPos(point.y+0.5)))
+                            .setZIndex(1);
+                    boardGroup.add(circle);
+                    circles[x][y] = circle;
+                }
+            }
             onTurn();
         }
         @Override
         public boolean onTurn() {
-            if(parts.size() != model.snake.size()){
-                Point point = model.snake.get(0).point;
-                Circle rect = module.createCircle()
-                        .setRadius((int)(dx/2.5))
-                        .setFillColor(red)
-                        .setLineColor(0xababab)
-                        .setLineWidth(1)
-                        .setX((int)(getPos(point.x+0.5)))
-                        .setY((int)(getPos(point.y+0.5)))
-                        .setZIndex(1);
-                boardGroup.add(rect);
-                module.commitEntityState(0.0, rect);
-                parts.add(0, rect);
-                tooltipModule.setTooltipText(rect, "PlayerId: " + model.id);
-            }
-
-            for(int i = 0; i < model.snake.size(); i++){
-                parts.get(i).setX(getPos(model.snake.get(i).point.x+0.5))
-                        .setY(getPos(model.snake.get(i).point.y+0.5));
-
-                if(model.isDead){
-                    parts.get(i).setScale(0.0, Curve.EASE_OUT);
+            if(game.numSteps > 1000) return !model.isDead;
+            for(int x = 0; x < Constants.WIDTH; x++){
+                for(int y = 0; y < Constants.HEIGHT; y++){
+                    final int xx = x;
+                    final int yy = y;
+                    if(model.snake.stream().anyMatch(s -> s.point.x == xx && s.point.y == yy)) circles[x][y].setAlpha(1.0);
+                    else circles[x][y].setAlpha(0.0);
                 }
             }
 

@@ -48,6 +48,10 @@
     </h1>
     <div class="statement-expert-rules-content">
       Food is eaten in place and snake grows instantly onto the tile of the food for simplicity.
+      <br>
+      Total score is pellets eaten. If you fill the board you get: pellets + 5 - numberOfSteps/5000.0 to make doing it faster better.
+      <br>
+      The game uses a pseudo-random number generator to spawn new numbers, please refer to <a href="https://github.com/eulerscheZahl/2048/blob/master/src/main/java/engine/Board.java#L25">github</a> for details.<br>
     </div>
   </div>
   <!-- PROTOCOL -->
@@ -101,6 +105,8 @@
       Time on the first round is 1 sec.
       <br>
       Time on every other round is 50 ms.
+      <br>
+      The view will not render anymore when the number of steps reaches 1000. And it will not render all steps with multiple steps.
     </div>
   </div>
   <!-- STORY -->

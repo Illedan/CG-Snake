@@ -4,7 +4,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class Snake {
-    public int score;
+    public int score = 1;
     public int id;
     public int turns;
     public ArrayList<SnakePart> snake = new ArrayList<>();

@@ -4,7 +4,8 @@ gameloop
 
 read seed:int
 read score:int size:int snake:word(1200)
-loop foodcount read x:int y:int
+read currentFoundCount:int
+loop currentFoundCount read x:int y:int
 write N
 
 STATEMENT
