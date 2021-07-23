@@ -7,14 +7,12 @@
       <span>The Goal</span>
     </h1>
     <div class="statement-goal-content">
-      The goal of this game is to eat all the pellets, forever (or 600 frames and max 25000 moves), without dying!
+      The goal of this game is to eat all the food, forever (or <const>600</const> frames and max <const>25000</const> moves), without dying!
       <br>
       <br>
       Print N, W, E or S to move in the given direction. Moving outside the map or onto yourself will kill you.
       <br>
       Printing multiple coordinates each round results in multiple movements ex: NNWEEEEES.
-      <br>
-      Use the seed found in the input to predict the next spawn points.
 
     </div>
   </div>
@@ -29,7 +27,7 @@
         The unit work as follows:
         <ul>
           <li>It moves 1 cell based on the Console output you provide during 1 round of the WHILE loop. </li>
-          <li>You are given a list of coordinates (separated with ','). Where the head is the first piece, which will move in the direction you choose.</li>
+          <li>You are given a list of coordinates. Where the head is the first piece, which will move in the direction you choose.</li>
           <li>You are given a list of food coordinates, which your snake head can pick up during its movement. Moving onto food will stop your snake and move the head to the tile of the food. (increasing the size by 1)</li>
         </ul>
         You <strong>lose</strong> if:
@@ -47,11 +45,11 @@
       <span>Expert Rules</span>
     </h1>
     <div class="statement-expert-rules-content">
-      Food is eaten in place and snake grows instantly onto the tile of the food for simplicity.
+      Food is eaten in place and snake grows instantly onto the tile of the food.
       <br>
-      Total score is pellets eaten. If you fill the board you get: pellets + 5 - numberOfSteps/5000.0 to make doing it faster better.
+      Total score is foods eaten. If you fill the board you get: "foods + 25000 - steps" -  to make doing it faster better.
       <br>
-      The game uses a pseudo-random number generator to spawn new numbers, please refer to <a href="https://github.com/Illedan/CG-Snake/blob/CG-Optim/src/main/java/com/codingame/game/Game.java#L142-L162">github</a> for details.<br>
+      The game uses a pseudo-random number generator to spawn more food, please refer to <a href="https://github.com/Illedan/CG-Snake/blob/CG-Optim/src/main/java/com/codingame/game/Game.java#L142-L162">github</a> for details.<br>
     </div>
   </div>
   <!-- PROTOCOL -->
@@ -64,11 +62,10 @@
     <div class="blk">
       <div class="text">The program must first read the initialization data from standard input. </div>
       <div class="text">
-        <p><span class="statement-lineno">One line: </span><var>width</var> <var>height</var> <var>foodcount</var></p>
+        <p><span class="statement-lineno">One line: </span><var>width</var> <var>height</var></p>
         <br>
         <ul>
           <li><var>width</var> and <var>height</var>: dimensions of the map.</li>
-          <li><var>foodcount</var>: number of food pellets always available on the map.</li>
         </ul>
       </div>
     </div>
@@ -77,13 +74,16 @@
     <div class="blk">
       <div class="title">Input during the while loop, to be read before outputting your command:</div>
       <div class="text">
-        <p><span class="statement-lineno"><var>seed</var> <span>Current seed of the game</span></p>
-        <p><span class="statement-lineno">Line 1: </span> <var>score</var> <var>size</var> <var>snake</var>. </p>
-        <p><span class="statement-lineno"><var>foodcount</var> lines: <var>x</var> <var>y</var></span></p>
+        <p><span class="statement-lineno"><var>seed</var> <span>Current seed of the game - used to simulate the next spawned foods</span></span></p>
+        <p><span class="statement-lineno"></span> <var>score</var> <var>snakeSize</var> </p>
+        <p><span class="statement-lineno"><var>snakeSize</var> lines: <var>snakeX</var> <var>snakeY</var></span><span> Head is the item in the collection.</span></p>
+        <p><span class="statement-lineno"></span> <var>currentFoundCount</var> </p>
+        <p><span class="statement-lineno"><var>currentFoundCount</var> lines: <var>x</var> <var>y</var></span></p>
         <ul>
           <li><var>score</var>: the points of the player..</li>
-          <li><var>size</var>: number of points in the next snake variable.</li>
-          <li><var>snake</var>: number on the format: "5,5,6,5" which is "x0,y0,x1,y1". Indicating the cells occupied by the snake. <var></var></li>
+          <li><var>snakeSize</var>: number of points in the next snake variable. The snake is given i order</li>
+          <li><var>snakeX</var>X position of the current snake part</li>
+          <li><var>snakeY</var>Y position of the current snake part</li>
           <li><var>x</var> and <var>y</var>: position of food spawned around the map.</li>
         </ul>
       </div>
@@ -95,7 +95,7 @@
       <div class="text">
         <span class="statement-lineno">A single line</span> containing <const>N</const>, <const>W</const>, <const>S</const> or <const>E</const>.
         <br>
-        <span>Include multiple directions to move many times a step. The game will NOT simulate all moves to save server storage.</span>
+        <span>Include multiple directions to move many times a step. The game will NOT display all moves separately to save server storage.</span>
       </div>
     </div>
 

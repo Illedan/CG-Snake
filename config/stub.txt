@@ -3,7 +3,8 @@ read width:int height:int foodcount:int
 gameloop
 
 read seed:int
-read score:int size:int snake:word(1200)
+read score:int snakeSize:int
+loop snakeSize read snakeX:int snakeY:int
 read currentFoundCount:int
 loop currentFoundCount read x:int y:int
 write N
