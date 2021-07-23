@@ -23,11 +23,13 @@ public class Referee extends AbstractReferee implements IReferee {
 
     @Override
     public void init() {
-        long seed = Integer.parseInt(gameManager.getTestCaseInput().get(0));;
+        String[] input = gameManager.getTestCaseInput().get(0).split(":");
+        long seed = Integer.parseInt(input[0]);
+        int food = Integer.parseInt(input[1]);
         gameManager.setFrameDuration(500);
         gameManager.setMaxTurns(601);
         gameManager.setTurnMaxTime(50);
-        game = new Game(this, seed);
+        game = new Game(this, seed, food);
         viewController = new ViewController(game, graphicEntityModule, gameManager, tooltipModule);
     }
 

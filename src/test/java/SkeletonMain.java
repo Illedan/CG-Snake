@@ -19,7 +19,7 @@ public class SkeletonMain {
 
         // Adds as many player as you need to test your game
         gameRunner.setAgent(Agent1.class);
-        gameRunner.setTestCase("test1.json");
+        gameRunner.setTestCase("test2.json");
 
         // Another way to add a player
         //gameRunner.addAgent("dotnet run --project /Users/erikkvanli/Repos/CG-Snake/config/BossProj/BossProj.csproj ");
