@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class Game {
-    private Random rnd;
     public int currentPlayer = 0;
     public ArrayList<Snake> snakes = new ArrayList<>();
     public ArrayList<Point> food = new ArrayList<>();
@@ -16,13 +15,13 @@ public class Game {
     private int maxTurns;
     public int numSteps;
     private long seed;
+    public int TurnMoves;
     private long secretSeed = 1337L; // This seed is to make local replication harder ;)
     private int maxFood;
     public Game(IReferee referee, long seed, int food){ // This code is written for a multiplayer game. Lazy factorization to published.
         maxTurns = 600;
         this.referee = referee;
         this.seed = seed;
-        rnd = new Random(seed ^ secretSeed);
         maxFood = food;
         for(int i = 0; i < 1; i++){
             snakes.add(new Snake(i, findRandomEmpty()));
@@ -50,6 +49,7 @@ public class Game {
                 EndGame();
                 return;
             }
+            TurnMoves = input.trim().length();
 
             for(char dir: input.trim().toCharArray()){
                 SnakeDirection direction = new SnakeDirection(dir+"");
@@ -85,6 +85,7 @@ public class Game {
 
     private void EndGame(){
         double score = snakes.get(0).score + (snakes.get(0).score == 600 ?25000 - numSteps:0);
+        snakes.get(0).kill();
         referee.addGameSummary("Total steps: " + numSteps);
         referee.updateScore(score);
         referee.endGame();
@@ -117,12 +118,24 @@ public class Game {
     }
 
     private Point findRandomEmpty(){
-        Point p = new Point(rnd.nextInt(Constants.WIDTH), rnd.nextInt(Constants.HEIGHT));
-        while(hasFood(p) || hasSnakePart(p)){
-            p = new Point(rnd.nextInt(Constants.WIDTH), rnd.nextInt(Constants.HEIGHT));
+        ArrayList<Point> freeCells = new ArrayList<>();
+        for (int x = 0; x < Constants.WIDTH; x++) {
+            if(x%2 == 0){ // This is flipping to make food spawn closer on minor snake changes (not wrapped)
+                for (int y = 0; y < Constants.HEIGHT; y++) {
+                    Point p = new Point(x, y);
+                    if(hasFood(p) || hasSnakePart(p)) continue;
+                    freeCells.add(p);
+                }
+            }else{
+                for (int y = Constants.HEIGHT-1; y >= 0; y--) {
+                    Point p = new Point(x, y);
+                    if(hasFood(p) || hasSnakePart(p)) continue;
+                    freeCells.add(p);
+                }
+            }
         }
-
-        return p;
+        if(freeCells.size() == 0) return null;
+        return freeCells.get((int) seed % freeCells.size());
     }
 
     private boolean hasFood(Point point){
@@ -151,24 +164,8 @@ public class Game {
 
     private void spawnFood() {
         if(food.size() >= maxFood) return;
-        ArrayList<Point> freeCells = new ArrayList<>();
-        for (int x = 0; x < Constants.WIDTH; x++) {
-            if(x%2 == 0){ // This is flipping to make food spawn closer on minor snake changes (not wrapped)
-                for (int y = 0; y < Constants.HEIGHT; y++) {
-                    Point p = new Point(x, y);
-                    if(hasFood(p) || hasSnakePart(p)) continue;
-                    freeCells.add(p);
-                }
-            }else{
-                for (int y = Constants.HEIGHT-1; y >= 0; y--) {
-                    Point p = new Point(x, y);
-                    if(hasFood(p) || hasSnakePart(p)) continue;
-                    freeCells.add(p);
-                }
-            }
-        }
-        if(freeCells.size() == 0) return;
-        Point spawnIndex = freeCells.get((int) seed % freeCells.size());
+        Point spawnIndex = findRandomEmpty();
+        if(spawnIndex == null) return;
         food.add(spawnIndex);
         seed = seed * seed % 50515093L;
     }

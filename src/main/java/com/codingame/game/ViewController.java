@@ -20,6 +20,7 @@ public class ViewController {
     private double dy;
     private SoloGameManager<Player> gameManager;
     private int red = 0xff0000;
+    private int Renders = 0;
 
     private ArrayList<IViewPart> parts = new ArrayList<>();
     public ViewController(Game game, GraphicEntityModule module, SoloGameManager<Player> gameManager, TooltipModule tooltipModule) {
@@ -89,6 +90,8 @@ public class ViewController {
 
 
     public void onTurn() {
+        if(game.TurnMoves > 1) Renders++;
+        if(Renders > 150 && !game.snakes.get(0).isDead && game.snakes.get(0).turns < 598) return;
         // View part
         ArrayList<IViewPart> toRemove = new ArrayList<>();
         for(IViewPart part : parts) {
@@ -219,14 +222,14 @@ public class ViewController {
 
 
         private void hide(Point p){
-            if(circles[p.x][p.y] != null) {
+            if(circles[p.x][p.y] != null && circles[p.x][p.y].isVisible()) {
                 circles[p.x][p.y].setVisible(false);
-                return;
             }
         }
 
         private void createOrShow(Point p){
             if(circles[p.x][p.y] != null) {
+                if(circles[p.x][p.y].isVisible()) return;
                 circles[p.x][p.y].setVisible(true);
                 return;
             }
@@ -266,13 +269,14 @@ public class ViewController {
         }
 
         private void hide(Point p){
-            if(circles[p.x][p.y] != null) {
+            if(circles[p.x][p.y] != null && circles[p.x][p.y].isVisible()) {
                 circles[p.x][p.y].setVisible(false);
             }
         }
 
         private void createOrShow(Point p){
             if(circles[p.x][p.y] != null) {
+                if(circles[p.x][p.y].isVisible()) return;
                 circles[p.x][p.y].setVisible(true);
                 return;
             }
