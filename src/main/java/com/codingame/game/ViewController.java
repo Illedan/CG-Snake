@@ -206,37 +206,50 @@ public class ViewController {
     class FoodViewPart implements IViewPart{
         private Game game;
         private HashMap<Point, Circle> foodMap = new HashMap<>();
-
+        private Circle[][] circles = new Circle[Constants.WIDTH][Constants.HEIGHT];
         public FoodViewPart(Game game){
             this.game = game;
+            for(int x = 0; x < Constants.WIDTH; x++){
+                for(int y = 0; y < Constants.HEIGHT; y++){
+
+                }
+            }
+            onTurn();
+        }
+
+
+        private void hide(Point p){
+            if(circles[p.x][p.y] != null) {
+                circles[p.x][p.y].setVisible(false);
+                return;
+            }
+        }
+
+        private void createOrShow(Point p){
+            if(circles[p.x][p.y] != null) {
+                circles[p.x][p.y].setVisible(true);
+                return;
+            }
+            Point food = p;
+            Circle foodView = module.createCircle()
+                    .setFillColor(0x87821a)
+                    .setLineColor(0x000000)
+                    .setRadius((int)(dx/2.5))
+                    .setX((int)(getPos(food.x+0.5)))
+                    .setY((int)(getPos(food.y+0.5)))
+                    .setVisible(false);
+            boardGroup.add(foodView);
+            circles[p.x][p.y] = foodView;
         }
 
         @Override
         public boolean onTurn() {
-            if(game.numSteps > 1000) return true;
-            ArrayList<Point> toRemove = new ArrayList<>();
-            for(Point food : foodMap.keySet()){
-                if(!game.food.contains(food)){
-                    toRemove.add(food);
-                }
-            }
-            for(Point food : toRemove){
-                foodMap.get(food).setScale(0, Curve.EASE_OUT);
-                foodMap.remove(food);
-            }
-
-            for(Point food : game.food){
-                if(!foodMap.containsKey(food)){
-                    Circle foodView = module.createCircle()
-                            .setFillColor(0x87821a)
-                            .setLineColor(0x000000)
-                            .setRadius((int)(dx/2.5))
-                            .setX((int)(getPos(food.x+0.5)))
-                            .setY((int)(getPos(food.y+0.5)))
-                            .setScale(1.0);
-                    boardGroup.add(foodView);
-                    module.commitEntityState(0.0, foodView, boardGroup);
-                    foodMap.put(food, foodView);
+            for(int x = 0; x < Constants.WIDTH; x++){
+                for(int y = 0; y < Constants.HEIGHT; y++){
+                    final int xx = x;
+                    final int yy = y;
+                    if(game.food.stream().anyMatch(s -> s.x == xx && s.y == yy)) createOrShow(new Point(xx, yy));
+                    else hide(new Point(xx, yy));
                 }
             }
 
@@ -246,37 +259,43 @@ public class ViewController {
 
     class SnakeViewPart implements IViewPart {
         private Snake model;
-        private ArrayList<Circle> parts = new ArrayList<>();
         private Circle[][] circles = new Circle[Constants.WIDTH][Constants.HEIGHT];
         public SnakeViewPart(Snake model){
             this.model = model;
-            for(int x = 0; x < Constants.WIDTH; x++){
-                for(int y = 0; y < Constants.HEIGHT; y++){
-                    Point point = new Point(x, y);
-                    Circle circle = module.createCircle()
-                            .setRadius((int)(dx/2.5))
-                            .setFillColor(red)
-                            .setLineColor(0xababab)
-                            .setLineWidth(1)
-                            .setAlpha(0.0)
-                            .setX((int)(getPos(point.x+0.5)))
-                            .setY((int)(getPos(point.y+0.5)))
-                            .setZIndex(1);
-                    boardGroup.add(circle);
-                    circles[x][y] = circle;
-                }
-            }
             onTurn();
+        }
+
+        private void hide(Point p){
+            if(circles[p.x][p.y] != null) {
+                circles[p.x][p.y].setVisible(false);
+            }
+        }
+
+        private void createOrShow(Point p){
+            if(circles[p.x][p.y] != null) {
+                circles[p.x][p.y].setVisible(true);
+                return;
+            }
+            Point point = p;
+            Circle circle = module.createCircle()
+                    .setRadius((int)(dx/2.5))
+                    .setFillColor(red)
+                    .setLineColor(0xababab)
+                    .setLineWidth(0)
+                    .setX((int)(getPos(point.x+0.5)))
+                    .setY((int)(getPos(point.y+0.5)))
+                    .setZIndex(1);
+            boardGroup.add(circle);
+            circles[p.x][p.y] = circle;
         }
         @Override
         public boolean onTurn() {
-            if(game.numSteps > 1000) return !model.isDead;
             for(int x = 0; x < Constants.WIDTH; x++){
                 for(int y = 0; y < Constants.HEIGHT; y++){
                     final int xx = x;
                     final int yy = y;
-                    if(model.snake.stream().anyMatch(s -> s.point.x == xx && s.point.y == yy)) circles[x][y].setAlpha(1.0);
-                    else circles[x][y].setAlpha(0.0);
+                    if(model.snake.stream().anyMatch(s -> s.point.x == xx && s.point.y == yy)) createOrShow(new Point(xx, yy));
+                    else hide(new Point(xx, yy));
                 }
             }
 

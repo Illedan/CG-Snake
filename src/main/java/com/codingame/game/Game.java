@@ -45,6 +45,11 @@ public class Game {
         String[] output = createInput();
         try {
             String input = referee.sendInput(output);
+            if(input.trim().length() == 0) {
+                referee.addGameSummary("Empty input.");
+                EndGame();
+                return;
+            }
 
             for(char dir: input.trim().toCharArray()){
                 SnakeDirection direction = new SnakeDirection(dir+"");
