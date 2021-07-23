@@ -14,7 +14,7 @@ public class Game {
     public ArrayList<Point> food = new ArrayList<>();
     private IReferee referee;
     private int maxTurns;
-    private int numSteps;
+    public int numSteps;
     private long seed;
     private long secretSeed = 1337L; // This seed is to make local replication harder ;)
     private int maxFood;
@@ -23,7 +23,7 @@ public class Game {
         this.referee = referee;
         this.seed = seed;
         rnd = new Random(seed ^ secretSeed);
-        maxFood = rnd.nextInt( Constants.MAX_FOOD - 2) + 3;
+        maxFood = rnd.nextInt( Constants.MAX_FOOD) + 1;
         for(int i = 0; i < 1; i++){
             snakes.add(new Snake(i, findRandomEmpty()));
         }
@@ -37,8 +37,8 @@ public class Game {
         }
 
         Snake currentSnake = snakes.get(0);
-        if (currentSnake.turns++ >= maxTurns || numSteps > 25000 || currentSnake.snake.size() == 600){
-            referee.endGame();
+        if (currentSnake.turns++ >= maxTurns || numSteps >= 25000 || currentSnake.snake.size() == 600){
+            EndGame();
             return;
         }
 
@@ -52,12 +52,14 @@ public class Game {
                 Point next = direction.getNext(currentSnake.snake.get(0).point);
                 currentSnake.move(direction, hasFood(next));
 
-                if(currentSnake.isDead){
+                if(currentSnake.isDead || numSteps >= 25000 || currentSnake.snake.size() == 600){
                     EndGame();
+                    break;
                 }
                 else if(isCollision(next, currentSnake.snake.get(0))){
                     currentSnake.kill();
                     EndGame();
+                    break;
                 }
                 else if(hasFood(next)){
                     food.remove(next);
@@ -77,7 +79,8 @@ public class Game {
     }
 
     private void EndGame(){
-        double score = snakes.get(0).score +(snakes.get(0).score==600?+ 5 - numSteps/5000.0:0); // 5x5000 => 25000 => Max number of steps. Please don't go in circles to burn CG CPU.
+        double score = snakes.get(0).score + (snakes.get(0).score == 600 ?25000 - numSteps:0);
+        referee.addGameSummary("Total steps: " + numSteps);
         referee.updateScore(score);
         referee.endGame();
     }
@@ -86,25 +89,21 @@ public class Game {
         Snake currentSnake = snakes.get(0);
         ArrayList<String> inputs = new ArrayList<>();
         if (!currentSnake.isInitialized){
-            inputs.add(Constants.WIDTH + " " + Constants.HEIGHT + " " + maxFood);
+            inputs.add(Constants.WIDTH + " " + Constants.HEIGHT);
         }
 
-        inputs.add(seed + "");
         for (Snake snake : snakes){
             if(snake.isDead) continue;
-            inputs.add(snake.score + " " + snake.snake.size() + " " + String.join(",",
-                    Arrays.asList(snake.snake.stream().map(s -> s.point.x + "," + s.point.y).toArray()).toArray(new String[snake.snake.size()])));
+            inputs.add(seed + " " + snake.score + " " + snake.snake.size() + " " + food.size());
+            for(SnakePart sp: snake.snake){
+                inputs.add(sp.point.x + " " + sp.point.y);
+            }
         }
-
         for (Point food : food){
             inputs.add(food.x + " " + food.y);
         }
         currentSnake.isInitialized = true;
         return GetStringArray(inputs);
-    }
-
-    private int getNextPlayer(){
-        return 0;
     }
 
     private boolean isCollision(Point next, SnakePart head){
