@@ -148,10 +148,18 @@ public class Game {
         if(food.size() >= maxFood) return;
         ArrayList<Point> freeCells = new ArrayList<>();
         for (int x = 0; x < Constants.WIDTH; x++) {
-            for (int y = 0; y < Constants.HEIGHT; y++) {
-                Point p = new Point(x, y);
-                if(hasFood(p) || hasSnakePart(p)) continue;
-                freeCells.add(p);
+            if(x%2 == 0){ // This is flipping to make food spawn closer on minor snake changes (not wrapped)
+                for (int y = 0; y < Constants.HEIGHT; y++) {
+                    Point p = new Point(x, y);
+                    if(hasFood(p) || hasSnakePart(p)) continue;
+                    freeCells.add(p);
+                }
+            }else{
+                for (int y = Constants.HEIGHT-1; y >= 0; y--) {
+                    Point p = new Point(x, y);
+                    if(hasFood(p) || hasSnakePart(p)) continue;
+                    freeCells.add(p);
+                }
             }
         }
         if(freeCells.size() == 0) return;
