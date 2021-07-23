@@ -27,7 +27,7 @@
         The unit work as follows:
         <ul>
           <li>It moves 1 cell based on the Console output you provide during 1 round of the WHILE loop. </li>
-          <li>You are given a list of coordinates. Where the head is the first piece, which will move in the direction you choose.</li>
+          <li>You are given a list of coordinates. The head is the first piece, which will move in the direction you choose.</li>
           <li>You are given a list of food coordinates, which your snake head can pick up during its movement. Moving onto food will stop your snake and move the head to the tile of the food. (increasing the size by 1)</li>
         </ul>
         You <strong>lose</strong> if:
@@ -74,16 +74,16 @@
     <div class="blk">
       <div class="title">Input during the while loop, to be read before outputting your command:</div>
       <div class="text">
-        <p><span class="statement-lineno"><var>seed</var> <span>Current seed of the game - used to simulate the next spawned foods</span></span></p>
-        <p><span class="statement-lineno"></span> <var>score</var> <var>snakeSize</var> </p>
-        <p><span class="statement-lineno"><var>snakeSize</var> lines: <var>snakeX</var> <var>snakeY</var></span><span> Head is the item in the collection.</span></p>
-        <p><span class="statement-lineno"></span> <var>currentFoundCount</var> </p>
+        <p><span class="statement-lineno"><var>seed</var> <var>score</var> <var>snakeSize</var> <var>currentFoundCount</var></span></p>
+        <p><span class="statement-lineno"><var>snakeSize</var> lines: <var>snakeX</var> <var>snakeY</var></span><span> Head is the first item in the collection.</span></p>
         <p><span class="statement-lineno"><var>currentFoundCount</var> lines: <var>x</var> <var>y</var></span></p>
         <ul>
-          <li><var>score</var>: the points of the player..</li>
+          <li><var>score</var>: the points of the player.</li>
+          <li><var>seed</var>: current seed of the game. Used to simulate further turns</li>
+          <li><var>currentFoundCount</var>: amount of food present on the board</li>
           <li><var>snakeSize</var>: number of points in the next snake variable. The snake is given i order</li>
-          <li><var>snakeX</var>X position of the current snake part</li>
-          <li><var>snakeY</var>Y position of the current snake part</li>
+          <li><var>snakeX</var>: X position of the current snake part</li>
+          <li><var>snakeY</var>: Y position of the current snake part</li>
           <li><var>x</var> and <var>y</var>: position of food spawned around the map.</li>
         </ul>
       </div>
