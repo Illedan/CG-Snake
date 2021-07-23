@@ -64,7 +64,7 @@ public class ViewController {
                         .setY(getPos(i))
                         .setAlpha(0);
                 tooltipModule.setTooltipText(cell, "x: " + x + "\ny: " + i);
-                bufferedGroup.add(cell);
+                boardGroup.add(cell);
             }
         }
 
