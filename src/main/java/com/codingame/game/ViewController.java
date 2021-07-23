@@ -47,8 +47,10 @@ public class ViewController {
                 .setY((int)(diffY/2));
 
         // grid
+        BufferedGroup bufferedGroup = module.createBufferedGroup();
+        boardGroup.add(bufferedGroup);
         for(int i = 0; i < Constants.HEIGHT + 1; i++){
-            boardGroup.add(module.createLine().setLineWidth(2)
+            bufferedGroup.add(module.createLine().setLineWidth(2)
                     .setZIndex(-5)
                     .setLineColor(0xababab)
                     .setX(0).setX2(getPos(Constants.WIDTH))
@@ -62,12 +64,12 @@ public class ViewController {
                         .setY(getPos(i))
                         .setAlpha(0);
                 tooltipModule.setTooltipText(cell, "x: " + x + "\ny: " + i);
-                boardGroup.add(cell);
+                bufferedGroup.add(cell);
             }
         }
 
         for(int i = 0; i < Constants.WIDTH + 1; i++){
-            boardGroup.add(module.createLine().setLineWidth(2)
+            bufferedGroup.add(module.createLine().setLineWidth(2)
                     .setZIndex(-5)
                     .setLineColor(0xababab)
                     .setY(0).setY2(getPos(Constants.HEIGHT))

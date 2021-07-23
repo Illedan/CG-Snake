@@ -18,12 +18,12 @@ public class Game {
     private long seed;
     private long secretSeed = 1337L; // This seed is to make local replication harder ;)
     private int maxFood;
-    public Game(IReferee referee, long seed){ // This code is written for a multiplayer game. Lazy factorization to published.
+    public Game(IReferee referee, long seed, int food){ // This code is written for a multiplayer game. Lazy factorization to published.
         maxTurns = 600;
         this.referee = referee;
         this.seed = seed;
         rnd = new Random(seed ^ secretSeed);
-        maxFood = rnd.nextInt( Constants.MAX_FOOD) + 1;
+        maxFood = food;
         for(int i = 0; i < 1; i++){
             snakes.add(new Snake(i, findRandomEmpty()));
         }
